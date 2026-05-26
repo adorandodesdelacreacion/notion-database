@@ -3,183 +3,178 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Task Widget</title>
+<title>Weekly Schedule</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #ffffff;
-    --bg-secondary: #f6f6f4;
-    --border: rgba(0,0,0,0.12);
-    --border-hover: rgba(0,0,0,0.25);
-    --text: #1a1a1a;
-    --text-muted: #6b6b6b;
-    --text-hint: #aaa;
-    --radius-md: 8px;
-    --radius-lg: 12px;
-    --radius-pill: 99px;
+    --bg: #ffffff; --bg-secondary: #f6f6f4;
+    --border: rgba(0,0,0,0.12); --border-hover: rgba(0,0,0,0.25);
+    --text: #1a1a1a; --text-muted: #6b6b6b; --text-hint: #aaa;
+    --radius-md: 8px; --radius-lg: 12px;
     --font: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #1e1e1e;
-      --bg-secondary: #2a2a2a;
-      --border: rgba(255,255,255,0.1);
-      --border-hover: rgba(255,255,255,0.22);
-      --text: #e8e8e8;
-      --text-muted: #999;
-      --text-hint: #555;
+      --bg: #1e1e1e; --bg-secondary: #2a2a2a;
+      --border: rgba(255,255,255,0.1); --border-hover: rgba(255,255,255,0.22);
+      --text: #e8e8e8; --text-muted: #999; --text-hint: #555;
     }
   }
   body { font-family: var(--font); background: var(--bg); color: var(--text); padding: 20px; min-height: 100vh; }
-  .tabs { display: flex; gap: 4px; background: var(--bg-secondary); border: 0.5px solid var(--border); border-radius: var(--radius-pill); padding: 3px; width: fit-content; margin-bottom: 16px; }
-  .tab { font-size: 13px; font-weight: 400; color: var(--text-muted); padding: 5px 14px; border-radius: var(--radius-pill); cursor: pointer; border: none; background: transparent; transition: background 0.15s, color 0.15s; white-space: nowrap; font-family: var(--font); display: flex; align-items: center; gap: 6px; }
-  .tab:hover { color: var(--text); }
-  .tab.active { background: var(--bg); color: var(--text); font-weight: 500; border: 0.5px solid var(--border); }
-  .badge-dot { font-size: 10px; font-weight: 600; min-width: 16px; height: 16px; border-radius: 99px; background: #E24B4A; color: #fff; display: inline-flex; align-items: center; justify-content: center; padding: 0 4px; line-height: 1; }
-  .badge-dot.hidden { display: none; }
-  .panel { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; min-height: 200px; }
-  .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-  .panel-title { font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); }
-  .count { font-size: 11px; color: var(--text-hint); background: var(--bg-secondary); padding: 2px 7px; border-radius: var(--radius-pill); border: 0.5px solid var(--border); }
-  .task-list { display: flex; flex-direction: column; gap: 6px; }
-  .task-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: var(--radius-md); border: 0.5px solid var(--border); background: var(--bg-secondary); transition: border-color 0.15s; }
-  .task-item:hover { border-color: var(--border-hover); }
-  .task-item.done .task-label { text-decoration: line-through; color: var(--text-hint); }
-  .task-check { width: 15px; height: 15px; border-radius: 3px; border: 0.5px solid var(--border-hover); background: transparent; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
-  .task-check.checked { background: var(--text); border-color: var(--text); }
-  .task-check.checked i { display: block; }
-  .task-check i { display: none; font-size: 10px; color: var(--bg); }
-  .task-label { font-size: 13px; color: var(--text); flex: 1; line-height: 1.3; }
-  .badge { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: var(--radius-pill); flex-shrink: 0; }
-  .badge-high { background: #FCEBEB; color: #A32D2D; }
-  .badge-medium { background: #FAEEDA; color: #854F0B; }
-  .badge-low { background: #EAF3DE; color: #3B6D11; }
-  @media (prefers-color-scheme: dark) {
-    .badge-high { background: #501313; color: #F09595; }
-    .badge-medium { background: #412402; color: #FAC775; }
-    .badge-low { background: #173404; color: #97C459; }
-  }
-  .task-del { font-size: 13px; color: var(--text-hint); cursor: pointer; opacity: 0; transition: opacity 0.15s; padding: 0 2px; }
-  .task-item:hover .task-del { opacity: 1; }
-  .add-row { display: flex; align-items: center; gap: 6px; margin-top: 12px; }
-  .add-row input[type="text"] { flex: 1; font-size: 13px; padding: 6px 10px; border-radius: var(--radius-md); border: 0.5px solid var(--border); background: var(--bg-secondary); color: var(--text); outline: none; font-family: var(--font); }
-  .add-row input[type="text"]::placeholder { color: var(--text-hint); }
-  .add-row input[type="text"]:focus { border-color: var(--border-hover); background: var(--bg); }
-  .prio-select { font-size: 12px; padding: 6px 8px; border-radius: var(--radius-md); border: 0.5px solid var(--border); background: var(--bg-secondary); color: var(--text-muted); font-family: var(--font); outline: none; cursor: pointer; }
-  .add-btn { width: 28px; height: 28px; border-radius: var(--radius-md); border: 0.5px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s; }
+  .grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+  .day-col { display: flex; flex-direction: column; gap: 6px; }
+  .day-header { display: flex; align-items: center; gap: 6px; padding: 6px 4px 8px; border-bottom: 0.5px solid var(--border); margin-bottom: 2px; }
+  .day-name { font-size: 11px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; flex: 1; }
+  .day-dot { width: 7px; height: 7px; border-radius: 50%; background: #E24B4A; flex-shrink: 0; transition: opacity 0.2s; }
+  .day-dot.hidden { opacity: 0; }
+  .drop-zone { min-height: 60px; border-radius: var(--radius-md); border: 0.5px dashed var(--border); padding: 4px; display: flex; flex-direction: column; gap: 4px; transition: background 0.15s, border-color 0.15s; }
+  .drop-zone.drag-over { background: var(--bg-secondary); border-color: var(--border-hover); }
+  .task-card { padding: 6px 8px; border-radius: var(--radius-md); border: 0.5px solid var(--border); background: var(--bg); font-size: 11px; color: var(--text); cursor: grab; user-select: none; display: flex; align-items: center; gap: 5px; transition: opacity 0.15s, border-color 0.15s; line-height: 1.3; }
+  .task-card:hover { border-color: var(--border-hover); }
+  .task-card.dragging { opacity: 0.25; cursor: grabbing; }
+  .task-card.done { text-decoration: line-through; color: var(--text-hint); }
+  .task-card.done .card-check { background: var(--text); border-color: var(--text); }
+  .task-card.done .card-check i { display: block; }
+  .drop-indicator { height: 2px; background: #534AB7; border-radius: 2px; margin: 0 2px; }
+  .card-check { width: 12px; height: 12px; border-radius: 2px; border: 0.5px solid var(--border-hover); flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .card-check i { display: none; font-size: 8px; color: var(--bg); }
+  .card-text { flex: 1; }
+  .card-del { font-size: 10px; color: var(--text-hint); cursor: pointer; opacity: 0; transition: opacity 0.1s; padding: 0 1px; }
+  .task-card:hover .card-del { opacity: 1; }
+  .add-row { display: flex; gap: 4px; margin-top: 4px; }
+  .add-input { flex: 1; font-size: 11px; padding: 4px 6px; border-radius: var(--radius-md); border: 0.5px solid var(--border); background: var(--bg-secondary); color: var(--text); outline: none; font-family: var(--font); min-width: 0; }
+  .add-input::placeholder { color: var(--text-hint); }
+  .add-input:focus { border-color: var(--border-hover); }
+  .add-btn { width: 22px; height: 22px; border-radius: var(--radius-md); border: 0.5px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .add-btn:hover { background: var(--bg-secondary); }
-  .empty-hint { font-size: 13px; color: var(--text-hint); text-align: center; padding: 24px 0; }
 </style>
 </head>
 <body>
-
-<div class="tabs" role="tablist" id="tabs"></div>
-<div class="panel" id="panel"></div>
-
+<div class="grid" id="grid"></div>
 <script>
-const TABS = [
-  { id: 'today', label: 'Today' },
-  { id: 'yesterday', label: 'Yesterday' },
-  { id: 'pending', label: 'Pending Task' }
-];
-
-const state = {
-  today: [],
-  yesterday: [],
-  pending: []
-};
-
-let active = 'today';
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const state = { Mon:[], Tue:[], Wed:[], Thu:[], Fri:[], Sat:[], Sun:[] };
 let nextId = 1;
+let drag = null;
 
-function pendingCount(colId) {
-  return state[colId].filter(t => !t.done).length;
+function hasPending(day) { return state[day].some(t => !t.done); }
+
+function getCardEls(zone) { return Array.from(zone.querySelectorAll('.task-card')); }
+
+function getInsertIndex(zone, clientY) {
+  const cards = getCardEls(zone);
+  for (let i = 0; i < cards.length; i++) {
+    const rect = cards[i].getBoundingClientRect();
+    if (clientY < rect.top + rect.height / 2) return i;
+  }
+  return cards.length;
 }
 
-function renderTabs() {
-  const tabsEl = document.getElementById('tabs');
-  tabsEl.innerHTML = TABS.map(t => {
-    const count = pendingCount(t.id);
-    return `<button class="tab${active === t.id ? ' active' : ''}" data-tab="${t.id}" role="tab" aria-selected="${active === t.id}">
-      ${t.label}
-      <span class="badge-dot${count === 0 ? ' hidden' : ''}">${count}</span>
-    </button>`;
-  }).join('');
-  document.querySelectorAll('.tab').forEach(btn => {
-    btn.addEventListener('click', () => {
-      active = btn.dataset.tab;
-      renderTabs();
-      renderPanel();
+function removeIndicator(zone) { zone.querySelectorAll('.drop-indicator').forEach(el => el.remove()); }
+
+function updateIndicator(zone, clientY) {
+  removeIndicator(zone);
+  const idx = getInsertIndex(zone, clientY);
+  const cards = getCardEls(zone);
+  const ind = document.createElement('div');
+  ind.className = 'drop-indicator';
+  if (idx >= cards.length) zone.appendChild(ind);
+  else zone.insertBefore(ind, cards[idx]);
+}
+
+function render() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  DAYS.forEach(day => {
+    const col = document.createElement('div');
+    col.className = 'day-col';
+    col.innerHTML = `<div class="day-header"><span class="day-name">${day}</span><span class="day-dot${hasPending(day) ? '' : ' hidden'}"></span></div>`;
+
+    const zone = document.createElement('div');
+    zone.className = 'drop-zone';
+    zone.dataset.day = day;
+
+    state[day].forEach(task => zone.appendChild(createCard(task, day)));
+
+    zone.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      zone.classList.add('drag-over');
+      updateIndicator(zone, e.clientY);
     });
+    zone.addEventListener('dragleave', e => {
+      if (!zone.contains(e.relatedTarget)) { zone.classList.remove('drag-over'); removeIndicator(zone); }
+    });
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      if (!drag) return;
+      const idx = getInsertIndex(zone, e.clientY);
+      const task = state[drag.fromDay].find(t => t.id === drag.id);
+      if (!task) { removeIndicator(zone); return; }
+      state[drag.fromDay] = state[drag.fromDay].filter(t => t.id !== drag.id);
+      state[day].splice(idx, 0, task);
+      removeIndicator(zone);
+      render();
+    });
+
+    col.appendChild(zone);
+
+    const addRow = document.createElement('div');
+    addRow.className = 'add-row';
+    addRow.innerHTML = `<input class="add-input" type="text" placeholder="Add…" maxlength="40" /><button class="add-btn" aria-label="Add task"><i class="ti ti-plus" style="font-size:12px;"></i></button>`;
+    const inp = addRow.querySelector('.add-input');
+    addRow.querySelector('.add-btn').addEventListener('click', () => addTask(day, inp));
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') addTask(day, inp); });
+    col.appendChild(addRow);
+    grid.appendChild(col);
   });
 }
 
-function renderPanel() {
-  const tasks = state[active];
-  const done = tasks.filter(t => t.done).length;
-  const tab = TABS.find(t => t.id === active);
-  document.getElementById('panel').innerHTML = `
-    <div class="panel-header">
-      <span class="panel-title">${tab.label}</span>
-      <span class="count">${done}/${tasks.length}</span>
-    </div>
-    <div class="task-list">
-      ${tasks.length === 0
-        ? '<div class="empty-hint">No tasks yet. Add one below.</div>'
-        : tasks.map(t => `
-          <div class="task-item${t.done ? ' done' : ''}">
-            <div class="task-check${t.done ? ' checked' : ''}" data-id="${t.id}" role="checkbox" aria-checked="${t.done}" tabindex="0">
-              <i class="ti ti-check"></i>
-            </div>
-            <span class="task-label">${t.text}</span>
-            <span class="badge badge-${t.prio}">${t.prio.charAt(0).toUpperCase()+t.prio.slice(1)}</span>
-            <span class="task-del" data-id="${t.id}" role="button" tabindex="0"><i class="ti ti-x"></i></span>
-          </div>`).join('')}
-    </div>
-    <div class="add-row">
-      <input type="text" id="new-task" placeholder="Add a task…" maxlength="80" />
-      <select class="prio-select" id="new-prio">
-        <option value="high">High</option>
-        <option value="medium" selected>Medium</option>
-        <option value="low">Low</option>
-      </select>
-      <button class="add-btn" id="add-btn"><i class="ti ti-plus" style="font-size:14px;"></i></button>
-    </div>
+function createCard(task, day) {
+  const card = document.createElement('div');
+  card.className = 'task-card' + (task.done ? ' done' : '');
+  card.draggable = true;
+  card.dataset.id = task.id;
+  card.innerHTML = `
+    <div class="card-check" role="checkbox" aria-checked="${task.done}" tabindex="0"><i class="ti ti-check"></i></div>
+    <span class="card-text">${task.text}</span>
+    <span class="card-del" role="button" tabindex="0" aria-label="Remove"><i class="ti ti-x"></i></span>
   `;
-  document.querySelectorAll('.task-check').forEach(el => {
-    el.addEventListener('click', () => toggle(+el.dataset.id));
-    el.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' ') toggle(+el.dataset.id); });
+  card.addEventListener('dragstart', e => {
+    drag = { id: task.id, fromDay: day };
+    setTimeout(() => card.classList.add('dragging'), 0);
+    e.dataTransfer.effectAllowed = 'move';
+    e.stopPropagation();
   });
-  document.querySelectorAll('.task-del').forEach(el => {
-    el.addEventListener('click', () => remove(+el.dataset.id));
+  card.addEventListener('dragend', () => {
+    card.classList.remove('dragging');
+    drag = null;
+    document.querySelectorAll('.drop-indicator').forEach(el => el.remove());
+    document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('drag-over'));
   });
-  document.getElementById('add-btn').addEventListener('click', addTask);
-  document.getElementById('new-task').addEventListener('keydown', e => { if(e.key==='Enter') addTask(); });
+  card.querySelector('.card-check').addEventListener('click', e => { e.stopPropagation(); toggleTask(day, task.id); });
+  card.querySelector('.card-del').addEventListener('click', e => { e.stopPropagation(); removeTask(day, task.id); });
+  return card;
 }
 
-function toggle(id) {
-  const t = state[active].find(t => t.id === id);
-  if(t) { t.done = !t.done; renderTabs(); renderPanel(); }
+function toggleTask(day, id) {
+  const t = state[day].find(t => t.id === id);
+  if (t) { t.done = !t.done; render(); }
+}
+function removeTask(day, id) {
+  state[day] = state[day].filter(t => t.id !== id);
+  render();
+}
+function addTask(day, input) {
+  const text = input.value.trim();
+  if (!text) return;
+  state[day].push({ id: nextId++, text, done: false });
+  render();
 }
 
-function remove(id) {
-  state[active] = state[active].filter(t => t.id !== id);
-  renderTabs(); renderPanel();
-}
-
-function addTask() {
-  const inp = document.getElementById('new-task');
-  const sel = document.getElementById('new-prio');
-  const text = inp.value.trim();
-  if(!text) return;
-  state[active].push({ id: nextId++, text, done: false, prio: sel.value });
-  renderTabs(); renderPanel();
-  document.getElementById('new-task').focus();
-}
-
-renderTabs();
-renderPanel();
+render();
 </script>
 </body>
 </html>
